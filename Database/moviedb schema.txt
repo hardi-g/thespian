@@ -1,0 +1,134 @@
+USE MOVIEDB;
+
+CREATE TABLE `movie` (
+	`movie_id` INT(11) NOT NULL PRIMARY KEY,
+	`title` VARCHAR(255) NOT NULL,
+	`language` VARCHAR(25),
+	`release_date` DATE,
+	`runtime` INT(11),
+	`overview` TEXT,
+	`tmdb_rating` DECIMAL(3,1),
+	`posterpath` VARCHAR(255),
+	`backdroppath` VARCHAR(255),
+	`trailerlink` VARCHAR(255),
+	`rating` DECIMAL(3,1),
+	`votes` INT(11) NULL DEFAULT NULL,
+	`prod_co` VARCHAR(255),
+	CONSTRAINT `rating` CHECK (`rating` >= 0 and `rating` <= 10)
+);
+
+CREATE TABLE `genres` (
+	`genre_id` INT(11) NOT NULL PRIMARY KEY,
+	`genre` VARCHAR(25) NOT NULL UNIQUE
+);
+
+CREATE TABLE `moviegenres` (
+	`movie_id` INT(11) NOT NULL,
+	`genre_id` INT(11) NOT NULL,
+	PRIMARY KEY (`movie_id`, `genre_id`),
+	CONSTRAINT `moviegenres_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
+	CONSTRAINT `moviegenres_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`genre_id`)
+);
+
+
+CREATE TABLE `people` (
+	`p_id` INT(11) NOT NULL PRIMARY KEY,
+	`name` VARCHAR(100) NOT NULL,
+	`dob` DATE,
+	`bio` TEXT,
+	`imgpath` VARCHAR(255),
+);
+
+CREATE TABLE `cast` (
+	`movie_id` INT(11) NOT NULL,
+	`p_id` INT(11) NOT NULL,
+	`role` VARCHAR(255) NOT NULL,
+	`position` INT(11),
+	PRIMARY KEY (`movie_id`, `p_id`, `role`),
+	CONSTRAINT `cast_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
+	CONSTRAINT `cast_ibfk_2` FOREIGN KEY (`p_id`) REFERENCES `people` (`p_id`)
+);
+
+CREATE TABLE `crew` (
+	`movie_id` INT(11) NOT NULL,
+	`p_id` INT(11) NOT NULL,
+	`job` VARCHAR(50) NOT NULL,
+	PRIMARY KEY (`movie_id`, `p_id`, `job`),
+	CONSTRAINT `crew_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
+	CONSTRAINT `crew_ibfk_2` FOREIGN KEY (`p_id`) REFERENCES `people` (`p_id`)
+);
+
+CREATE TABLE `users` (
+	`u_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`username` VARCHAR(50) NOT NULL UNIQUE,
+	`password` VARCHAR(75) NOT NULL,
+);
+
+CREATE TABLE `follow` (
+	`u_id` INT(11) NOT NULL,
+	`p_id` INT(11) NOT NULL,
+	PRIMARY KEY (`u_id`, `p_id`),
+	CONSTRAINT `follow_ibfk_1` FOREIGN KEY (`u_id`) REFERENCES `users` (`u_id`) ON DELETE CASCADE,
+	CONSTRAINT `follow_ibfk_2` FOREIGN KEY (`p_id`) REFERENCES `people` (`p_id`)
+);
+
+CREATE TABLE `list` (
+	`u_id` INT(11) NOT NULL,
+	`list_no` INT(11) NOT NULL,
+	`listname` VARCHAR(100) NOT NULL,
+	PRIMARY KEY (`u_id`, `list_no`),
+	CONSTRAINT `list_ibfk_1` FOREIGN KEY (`u_id`) REFERENCES `users` (`u_id`)ON DELETE CASCADE
+);
+
+CREATE TABLE `list_content` (
+	`u_id` INT(11) NOT NULL,
+	`list_no` INT(11) NOT NULL,
+	`movie_id` INT(11) NOT NULL,
+	`watch` DATE,
+	`score` DECIMAL(3,1),
+	PRIMARY KEY (`u_id`, `list_no`, `movie_id`),
+	CONSTRAINT `list_content_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
+	CONSTRAINT `list_content_ibfk_2` FOREIGN KEY (`u_id`, `list_no`) REFERENCES `list` (`u_id`, `list_no`)ON DELETE CASCADE,
+	CONSTRAINT `score` CHECK (`score` >= 0 and `score` <= 10)
+);
+
+
+DELIMITER //
+
+CREATE TRIGGER default_lists
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    INSERT INTO `list` (`u_id`, `list_no`, `listname`)
+    VALUES (NEW.u_id, 1, 'Completed'),
+           (NEW.u_id, 2, 'Planning'),
+           (NEW.u_id, 3, 'Favorites');
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER update_movie_rating_votes
+AFTER INSERT ON list_content
+FOR EACH ROW
+BEGIN
+    DECLARE total_score DECIMAL(10,1);
+    DECLARE total_votes INT;
+    
+    IF NEW.list_no = 1 THEN
+        -- Calculate total score and votes for the movie
+        SELECT SUM(score), COUNT(*) INTO total_score, total_votes
+        FROM list_content
+        WHERE movie_id = NEW.movie_id AND list_no = 1;
+        
+        -- Update movie rating and votes
+        UPDATE movie
+        SET rating = total_score / total_votes,
+            votes = total_votes
+        WHERE movie_id = NEW.movie_id;
+    END IF;
+END;
+//
+
+DELIMITER ;
