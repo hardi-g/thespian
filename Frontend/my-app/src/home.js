@@ -57,6 +57,10 @@ function Home() {
   const handleDivisionClick = (divisionName) => {
     navigate(`/movie/${divisionName}`); 
   };
+
+  const styles = {
+    color:"red"
+  }
   
   const consturl="https://image.tmdb.org/t/p/w500"
 
@@ -69,14 +73,14 @@ function Home() {
           <p className='welcomemessage'>Hey {getUsername()}! <br></br>Hope you are having a great day.</p>
           {lists.recommend && lists.recommend.length > 0 && (
               <>
-                <h1 className='listtitle'>Recommendations</h1>
+                <h1 className='listtitle'>Because you watched <span style={styles}>{lists["recent"][0][1]}</span></h1>
                 <div className='card-container'>
-                  {lists["top_rated"].map(card => (
-                    <Card image={consturl + card[2]} title={card[1]} id={card[0]} description={card[3]} handleClick={handleDivisionClick} />
-                  ))}
+                {lists["recommend"].map(card => (
+                <Card image={consturl + card[2]} title={card[1]} id={card[0]} description={card[3]} handleClick={handleDivisionClick} />
+              ))}
                 </div>
               </>
-            )}  
+            )} 
             {lists.recent && lists.recent.length > 0 && (
               <>
                 <h1 className='listtitle'>Recently Watched</h1>
@@ -98,8 +102,6 @@ function Home() {
                 </div>
               </>
             )}  
-
-            
           </>
         )}
         
@@ -115,7 +117,7 @@ function Home() {
           <>
             <h1 className='listtitle'>Top Rated</h1>
             <div className='card-container'>
-              {lists["recommend"].map(card => (
+              {lists["top_rated"].map(card => (
                 <Card image={consturl + card[2]} title={card[1]} id={card[0]} description={card[3]} handleClick={handleDivisionClick} />
               ))}
             </div>

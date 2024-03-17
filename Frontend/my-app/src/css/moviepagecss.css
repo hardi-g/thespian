@@ -236,3 +236,33 @@
     background-color: red;
     cursor: pointer;
 }
+
+.similartitle {
+    margin-left: 12%;
+    margin-top: 3%;
+    font-size: 40px;
+    color: rgb(58, 58, 58);
+}
+
+.similarlist {
+    display: grid;
+    grid-template-columns: 15% 15% 15% 15% 15%;
+    margin-left: 12.5%;
+    column-gap: 2.5%;
+}
+
+.similarlist div img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.similarlist div img:hover {
+    cursor: pointer;
+    scale: 1.1;
+}
+
+.similarlist div p {
+    text-align: center;
+    font-size: large;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
