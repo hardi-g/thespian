@@ -5,6 +5,9 @@ from datetime import timedelta
 # import mysql.connector
 from Auth import login_bp, signup_bp
 import database
+from recommendation import *
+import numpy as np
+import pandas as pd
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -68,10 +71,14 @@ def searchtop1():
         """
         cursor.execute(query3)
         upcoming = cursor.fetchall()
-        
-        query4 = "SELECT movie_id,title,posterpath,tmdb_rating FROM movie ORDER BY tmdb_rating DESC LIMIT 5"
-        cursor.execute(query4)
-        recommend = cursor.fetchall()
+        if ((ratings['movieId'] == recent[0][0]).sum()>0):
+            movie_ids11 = find_similar_movies(recent[0][0],  metric='cosine', k=10)
+            print(movie_ids11)
+            query4 = "SELECT movie_id,title,posterpath,tmdb_rating FROM movie WHERE movie_id IN ({}) order by movie_id LIMIT 5".format(','.join(map(str, movie_ids11)))
+            cursor.execute(query4)
+            recommend = cursor.fetchall()
+        else:
+            recommend = top_movies
     
         return jsonify({
             "recent":recent,
@@ -519,6 +526,16 @@ def get_movie_details():
                     result = cursor.fetchone()
                     score = result[0]
                     watch = result[1].strftime("%Y-%m-%d")
+
+        movieid = int(movie_id)
+        if (ratings['movieId'] == movieid).any():
+            movie_ids = find_similar_movies(movieid,  metric='cosine', k=10)
+            print(movie_ids)
+            query4 = "SELECT movie_id,title,posterpath FROM movie WHERE movie_id IN ({}) order by movie_id LIMIT 5".format(','.join(map(str, movie_ids)))
+            cursor.execute(query4)
+            similar = cursor.fetchall()
+        else:
+            similar = []
     
         movie_values={
             "id":movie[0][0],
@@ -539,7 +556,8 @@ def get_movie_details():
             "crew":crew,
             "lists": lists,
             "score": score,
-            "watch": watch
+            "watch": watch,
+            "similar": similar
         }
         return  jsonify(movie_values)
     
