@@ -42,7 +42,8 @@ function MoviePage() {
         similar: []
     });
 
-    const url="https://image.tmdb.org/t/p/w500"
+    const url = "https://image.tmdb.org/t/p/original"
+    const consturl="https://image.tmdb.org/t/p/w500"
     const youtubeurl="https://www.youtube.com/embed/"
 
    useEffect(() => {
@@ -90,6 +91,8 @@ function MoviePage() {
 
     const handlePosterClick = (divisionName) => {
         navigate(`/movie/${divisionName}`); 
+        window.location.reload();
+        window.scrollTo(0,0);
     };
   
 
@@ -215,7 +218,7 @@ function MoviePage() {
                     <img src={url+data.backdroppath}  className='img'/>
                 </div>
                 <div className='poster'>
-                    <img src={url+data.posterpath} />
+                    <img src={consturl+data.posterpath} />
                     <button onClick={handleAddClick}>{data.lists.length !== 0 ? 'Edit Entry' : 'Add to List'}</button>
                 </div>
                 {addbutton && (
@@ -268,7 +271,7 @@ function MoviePage() {
             <h1 className='casttitle'>Cast</h1>
             <div className='cacrframe'>
             {data.cast.map(card => (
-                 <Castcrewcard image={url+card[3]} title={card[2]}  description={card[0]} id={card[1]} handleClick={handleDivisionClick} />
+                 <Castcrewcard image={consturl+card[3]} title={card[2]}  description={card[0]} id={card[1]} handleClick={handleDivisionClick} />
         ))}
         
         </div>
@@ -277,7 +280,7 @@ function MoviePage() {
             <h1 className='casttitle'>Crew</h1>
             <div className='cacrframe'>
                 {data.crew.map(card => (
-            <Castcrewcard image={url+card[3]} title={card[2]} description={card[0]} id={card[1]}  handleClick={handleDivisionClick}/>
+            <Castcrewcard image={consturl+card[3]} title={card[2]} description={card[0]} id={card[1]}  handleClick={handleDivisionClick}/>
             ))}
             </div>
             </div>
@@ -295,7 +298,7 @@ function MoviePage() {
                 <div className='similarlist'>
                 {data["similar"].map(card => (
                     <div onClick={() => handlePosterClick(card[0])}>
-                        <img src={url + card[2]} />
+                        <img src={consturl + card[2]} />
                         <p>{card[1]}</p>
                     </div>
                 ))}
