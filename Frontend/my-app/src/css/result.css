@@ -1,0 +1,30 @@
+.resultbox {
+    width: 80%;
+    margin-left: 15%;
+    font-size: small;
+    font-family: Arial, Helvetica, sans-serif;
+    display: grid;
+    grid-template-columns: 13% 13% 13% 13% 13%;
+    column-gap: 5%;
+    row-gap: 80px;
+    text-align: center;
+}
+
+.resultbox div img {
+    width: 100%;
+    border-radius: 10px;
+    transition-duration: 0.3s;
+}
+
+.resultbox div img:hover {
+    scale: 1.1;
+    cursor: pointer;
+}
+
+.arrayisempty{
+    text-align: center;
+    margin-top: 150px;
+    font-size: 50px;
+    font-family: monospace;
+    color: rgb(139, 139, 139);
+}

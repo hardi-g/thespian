@@ -1,0 +1,91 @@
+.list {
+    width: 80vw;
+    margin-left: 10vw;
+    margin-right: 10vw;
+}
+
+.lists {
+    width: 60%;
+    display: flex;
+    margin: 2%;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: space-between;
+}
+
+.listcontent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 5%;
+}
+
+.posters {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2%;
+}
+
+.lists button {
+    height: 7vh;
+    width: 20vw;
+    font-size: larger;
+    text-align: center;
+    margin-bottom: 2%;
+    border: none;
+    background-color: rgb(234, 234, 234);
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 24px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+
+.lists button:hover, .lists button:focus {
+    background-color: white;
+}
+  
+
+.posters div {
+    position: relative;
+}
+
+.posters div img {
+    width: 70%;
+    margin-bottom: -20%;
+    transition-duration: 0.3s;
+}
+
+.posters div img:hover {
+    scale: 1.1;
+    cursor: pointer;
+}
+
+.postertitle {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+    margin-top: 12%;
+    width: 80%;
+}
+
+.postertitle1{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+    margin-top: 25%;
+    width: 80%;
+}
+
+.watchinfo {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 70%;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    top: 3%;
+    height: 10%;
+}
+
+.watchinfo p {
+    margin: auto;
+}
