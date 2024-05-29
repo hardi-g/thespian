@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request,session
+from flask import Flask,jsonify,request
 from flask_cors import CORS
 #from flask_mysqldb import MySQL
 from datetime import timedelta
@@ -146,7 +146,7 @@ def statics():
         cursor.execute(query, (loggedinuser,))
         pplfollowing = cursor.fetchall()
         
-        query99="""
+        query9="""
             SELECT movie.movie_id, movie.posterpath
             FROM users
             INNER JOIN list ON users.u_id = list.u_id
@@ -154,7 +154,7 @@ def statics():
             INNER JOIN movie ON list_content.movie_id = movie.movie_id
             WHERE users.username =%s AND list.listname = 'favorites';
         """
-        cursor.execute(query99,(loggedinuser,))
+        cursor.execute(query9,(loggedinuser,))
         
         favorites = cursor.fetchall()
         
