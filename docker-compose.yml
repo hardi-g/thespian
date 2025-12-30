@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: moviedb
+      MYSQL_USER: movieuser
+      MYSQL_PASSWORD: moviepass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./Database/moviedb.sql:/docker-entrypoint-initdb.d/moviedb.sql
+    ports:
+      - "3306:3306"
+
+  backend:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    container_name: flask-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: movieuser
+      DB_PASSWORD: moviepass
+      DB_NAME: moviedb
+    ports:
+      - "5000:5000"
+
+  frontend:
+    container_name: react-frontend
+    restart: always
+    build: ./Frontend/my-app
+    ports:
+        - "3000:3000"
+    environment:
+        - HOST=0.0.0.0
+        - CHOKIDAR_USEPOLLING=true
+    depends_on:
+        - backend
+
+volumes:
+    db_data:

@@ -25,7 +25,6 @@ function LoginPage() {
       })
       .then(data => {
         localStorage.setItem('username', data.username);
-        const loggedinusername=localStorage.getItem('username')
         setStatus('Logged in successfully');
         navigate(`/home`)
       })

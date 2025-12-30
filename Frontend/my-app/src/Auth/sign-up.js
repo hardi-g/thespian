@@ -8,7 +8,6 @@ function SignUpPage() {
 
   const [username, setusername] = useState('');
   const [password, setpassword] = useState('');
-  const [email, setemail] = useState('');
   const [confirmpassword, setconfirmpassword] = useState('');
 
   function handlesubmit(event){
@@ -35,10 +34,6 @@ function SignUpPage() {
     setusername(event.target.value);
   }
 
-  const handleChangeemail = (event) => {
-    setemail(event.target.value);
-  }
-
   const handleChangepassword = (event) => {
     setpassword(event.target.value);
   }
@@ -52,7 +47,6 @@ function SignUpPage() {
     const body = {
       username: username,
       password: password,
-      email:email
     };
 
     fetch('http://127.0.0.1:5000/signup', {
@@ -85,8 +79,6 @@ function SignUpPage() {
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input type="email" id="email" name="email" 
-            value={email} 
-            onChange={handleChangeemail}
             required />
           </div>
 

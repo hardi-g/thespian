@@ -28,7 +28,6 @@ function Profile () {
     totalmovies:'',
     peoplefollowing:'',
     average_score:'',
-    email:'',
     pplfollowing:[],
     favorites:[],
     Action:'0',
@@ -91,7 +90,7 @@ const movie_img="https://image.tmdb.org/t/p/w500"
     <div className='appp'>
       <Navbar/>
       <div className='topcontainer'>
-        <div className="profile-section"><Sidebar username={loggedinuser} email={stats.email}/></div>
+        <div className="profile-section"><Sidebar username={loggedinuser}/></div>
           <Statics totalmovies={stats.totalmovies } peoplefollowing={stats.peoplefollowing} average_score={stats.average_score} />
         <GenreOverview
         Action={stats.Action}

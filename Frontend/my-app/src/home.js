@@ -7,8 +7,6 @@ import Footer from './defaults/footer';
 import { getUsername } from './Auth/Login';
 
 function Home() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   const [lists, setLists] = useState({
     recent: [],
@@ -17,26 +15,29 @@ function Home() {
     top_rated: []
   });
 
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getUsername());
+
+
   useEffect(() => {
     const username = getUsername();
-    if(!!username){
+
+    if (!username) {
+      setIsLoggedIn(false);
+      navigate('/home', { replace: true });
+
+    } else {
+      setIsLoggedIn(true);
       insertArticle();
-      setIsLoggedIn(!!username);
     }
-    else{
-      navigate(`/login`)
-    }
-    
   }, []);
+
   
    function InsertArticle(body){
-    return fetch(`http://127.0.0.1:5000`,{
-          'method':'POST',
-           headers : {
-          'Content-Type':'application/json'
-      },
-      body:JSON.stringify(body)
-    })
+     return fetch(`http://flask-backend:5000`, {
+       method: 'POST',
+       headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify(body)
+     })
   .then(response => response.json())
   .then(jsonData => {
     setLists(jsonData)

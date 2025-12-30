@@ -1,14 +1,5 @@
 from flask import Blueprint, request, jsonify
 import bcrypt, database
-# import mysql.connector
-
-# conn = mysql.connector.connect(
-#     host="localhost",
-#     user="root",
-#     password="",
-#     database=""
-# )
-# cur = conn.cursor()
 cur = database.connect()
 
 login_bp = Blueprint('login', __name__)
@@ -45,7 +36,6 @@ def signup():
 
     username = data['username']
     password = data['password']
-    email=data['email']
 
     cur.execute("SELECT * FROM users WHERE username = %s", (username,))
     existing_user = cur.fetchone()
@@ -55,7 +45,7 @@ def signup():
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-    cur.execute("INSERT INTO users (username, password,email) VALUES (%s, %s,%s)", (username, hashed_password.decode('utf-8'),email))
+    cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_password.decode('utf-8')))
     cur.execute("COMMIT")
 
     return jsonify({'message': 'User created successfully'}), 201

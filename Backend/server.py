@@ -1,30 +1,12 @@
 from flask import Flask,jsonify,request
 from flask_cors import CORS
-#from flask_mysqldb import MySQL
 from datetime import timedelta
-# import mysql.connector
 from Auth import login_bp, signup_bp
 import database
-from recommendation import *
-import numpy as np
-import pandas as pd
 
 app = Flask(__name__)
 cors = CORS(app)
 cursor = database.connect()
-
-# try:
-#     connection = mysql.connector.connect(
-#         host="localhost",
-#         user="root",
-#         password="",
-#         database=""
-#     )
-#     cursor = connection.cursor()
-# except mysql.connector.Error as error:
-#     print("Error connecting to MySQL:", error)
-# finally:
-#     print("Database connected")
 
 app.register_blueprint(login_bp)
 app.register_blueprint(signup_bp)
@@ -71,14 +53,7 @@ def searchtop1():
         """
         cursor.execute(query3)
         upcoming = cursor.fetchall()
-        if ((ratings['movieId'] == recent[0][0]).sum()>0):
-            movie_ids11 = find_similar_movies(recent[0][0],  metric='cosine', k=10)
-            print(movie_ids11)
-            query4 = "SELECT movie_id,title,posterpath,tmdb_rating FROM movie WHERE movie_id IN ({}) order by movie_id LIMIT 5".format(','.join(map(str, movie_ids11)))
-            cursor.execute(query4)
-            recommend = cursor.fetchall()
-        else:
-            recommend = top_movies
+        recommend = top_movies
     
         return jsonify({
             "recent":recent,
@@ -130,10 +105,7 @@ def statics():
             average_score=0
         print(average_score)
         
-        query = "SELECT email FROM users WHERE username = %s"
         username = loggedinuser
-        cursor.execute(query, (username,))
-        email = cursor.fetchall()
     
         query = """
         SELECT people.p_id, people.name, people.imgpath
@@ -162,7 +134,6 @@ def statics():
             "totalmovies":totalmovies,
             "peoplefollowing":peoplefollowing,
             "average_score":round(average_score,1),
-            "email":email[0],
             "pplfollowing":pplfollowing,
             "favorites":favorites,
             "Action":'0',
@@ -528,14 +499,7 @@ def get_movie_details():
                     watch = result[1].strftime("%Y-%m-%d")
 
         movieid = int(movie_id)
-        if (ratings['movieId'] == movieid).any():
-            movie_ids = find_similar_movies(movieid,  metric='cosine', k=10)
-            print(movie_ids)
-            query4 = "SELECT movie_id,title,posterpath FROM movie WHERE movie_id IN ({}) order by movie_id LIMIT 5".format(','.join(map(str, movie_ids)))
-            cursor.execute(query4)
-            similar = cursor.fetchall()
-        else:
-            similar = []
+        similar = []
     
         movie_values={
             "id":movie[0][0],
@@ -574,53 +538,46 @@ def update():
                 score = request.json['score']
                 watch = request.json['watchDate']
                 query1 = """
-                    DELETE FROM list_content
-                    WHERE movie_id = %s
-                    AND (u_id, list_no) IN (
-                        SELECT u_id, list_no 
-                        FROM list 
-                        WHERE u_id = (
-                            SELECT u_id
-                            FROM users 
-                            WHERE username = %s) 
-                        AND list_no = 2);
+                    DELETE lc
+                    FROM list_content lc
+                    JOIN list l ON lc.u_id = l.u_id AND lc.list_no = l.list_no
+                    JOIN users u ON l.u_id = u.u_id
+                    WHERE lc.movie_id = %s
+                    AND l.list_no = 2
+                    AND u.username = %s;
+
                 """
                 cursor.execute(query1, (movie_id, username))
                 
                 query2 = """
                     INSERT INTO list_content (u_id, list_no, movie_id, watch, score)
-                    VALUES (
-                        (SELECT u_id FROM users WHERE username = %s),
-                        1, %s, %s, %s
-                    )
+                    SELECT u.u_id, 1, %s, %s, %s
+                    FROM users u
+                    WHERE u.username = %s
                     ON DUPLICATE KEY UPDATE
-                        watch = %s,
-                        score = %s;
+                        watch = VALUES(watch),
+                        score = VALUES(score);
                 """
                 cursor.execute(query2, (username, movie_id, watch, score, watch, score))
                 cursor.execute('COMMIT')
                 
             else:
                 query3 = """
-                    DELETE FROM list_content
-                    WHERE movie_id = %s
-                    AND (u_id, list_no) IN (
-                        SELECT u_id, list_no 
-                        FROM list 
-                        WHERE u_id = (
-                            SELECT u_id
-                            FROM users 
-                            WHERE username = %s) 
-                        AND list_no = 1);
+                    DELETE lc
+                    FROM list_content lc
+                    JOIN users u ON lc.u_id = u.u_id
+                    JOIN list l ON lc.u_id = l.u_id AND lc.list_no = l.list_no
+                    WHERE u.username = %s
+                    AND lc.movie_id = %s
+                    AND l.list_no = 1;
                 """
                 cursor.execute(query3, (movie_id, username))
                 
                 query4 = """
                     INSERT IGNORE INTO list_content (u_id, list_no, movie_id, watch, score)
-                    VALUES (
-                        (SELECT u_id FROM users WHERE username = %s),
-                        2, %s, NULL, NULL
-                    )
+                    SELECT u.u_id, 2, %s, NULL, NULL
+                    FROM users u
+                    WHERE u.username = %s;
                 """
                 cursor.execute(query4, (username, movie_id))
                 cursor.execute('COMMIT')
@@ -629,25 +586,19 @@ def update():
             if fav:
                 query5 = """
                     INSERT IGNORE INTO list_content (u_id, list_no, movie_id, watch, score)
-                    VALUES (
-                        (SELECT u_id FROM users WHERE username = %s),
-                        3, %s, NULL, NULL
-                    )
+                    SELECT u.u_id, 3, %s, NULL, NULL
+                    FROM users u
+                    WHERE u.username = %s;
                 """
                 cursor.execute(query5, (username, movie_id))
                 cursor.execute('COMMIT')
             else:
                 query6 = """
-                    DELETE FROM list_content
-                    WHERE movie_id = %s
-                    AND (u_id, list_no) IN (
-                        SELECT u_id, list_no 
-                        FROM list 
-                        WHERE u_id = (
-                            SELECT u_id
-                            FROM users 
-                            WHERE username = %s) 
-                        AND list_no = 3);
+                    DELETE lc
+                    FROM list_content lc
+                    JOIN list l ON lc.u_id = l.u_id AND lc.list_no = l.list_no
+                    JOIN users u ON l.u_id = u.u_id
+                    WHERE lc.movie_id = %s AND u.username = %s AND l.list_no = 3;
                 """
                 cursor.execute(query6, (movie_id, username))
                 cursor.execute('COMMIT')
@@ -667,15 +618,11 @@ def delete():
             print(movie_id, username)
             
             query = """
-                DELETE FROM list_content
-                WHERE movie_id = %s
-                AND (u_id, list_no) IN (
-                    SELECT u_id, list_no 
-                    FROM list 
-                    WHERE u_id = (
-                        SELECT u_id
-                        FROM users 
-                        WHERE username = %s));
+                DELETE lc
+                FROM list_content lc
+                JOIN list l ON lc.u_id = l.u_id AND lc.list_no = l.list_no
+                JOIN users u ON l.u_id = u.u_id
+                WHERE lc.movie_id = %s AND u.username = %s;
             """
             cursor.execute(query, (movie_id, username))
             cursor.execute('COMMIT')
@@ -685,4 +632,4 @@ def delete():
             return jsonify(success=False)
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(host="0.0.0.0", port=5000)

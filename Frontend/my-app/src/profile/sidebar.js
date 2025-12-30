@@ -13,7 +13,6 @@ function Sidebar(props) {
     <div className="sidebar">
       <CgProfile  size={120}/>
       <h2>{props.username}</h2>
-      <h3>{props.email}</h3>
       <button className='Change_pass' >Edit profile</button>
     </div>
   );
