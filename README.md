@@ -89,3 +89,12 @@ docker-compose up --build
 - Performance optimizations and caching
 - Pagination and lazy loading
 - Recommendation features
+
+---
+
+## Screenshots
+<img width="1470" height="2885" alt="Screenshot 2025-12-26 at 18-48-16 Movie Tracker" src="https://github.com/user-attachments/assets/6bd7fb6b-a64f-4285-8071-18a166acb471" />
+<img width="1486" height="2060" alt="Screenshot 2025-12-26 at 18-57-49 Movie Tracker" src="https://github.com/user-attachments/assets/137f0b4f-47d6-49a6-8cea-ebc3ada11927" />
+<img width="1470" height="804" alt="Screenshot 2025-12-26 at 18-53-25 Movie Tracker" src="https://github.com/user-attachments/assets/d3d8c4b0-3ed1-40b4-af5a-d176af01f0f5" />
+<img width="1470" height="804" alt="Screenshot 2025-12-26 at 18-52-43 Movie Tracker" src="https://github.com/user-attachments/assets/52b8e7b7-0c8b-4b88-aa46-83c489302124" />
+<img width="1470" height="935" alt="Screenshot 2025-12-26 at 18-56-44 Movie Tracker" src="https://github.com/user-attachments/assets/020bedbc-3790-4f96-a329-f65161116763" />
