@@ -65,7 +65,7 @@ The project focuses on **clean architecture, real-world data modeling, and produ
 ## Running the Project
 - Install Docker as a prerequiste and then run:
 ```bash
-git clone https://github.com/hardi-g/thespian.git
+git clone https://github.com/imhrdk/thespian.git
 cd thespian
 docker-compose up --build
 ```
